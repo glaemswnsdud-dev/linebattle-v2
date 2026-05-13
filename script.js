@@ -3,16 +3,23 @@ import {UNIT_STATS, createUnit} from './unit.js';
 let sceneRef;
 let gameEnded = false;
 let gamePaused = false;
+
 let currentMiniTeam = 1;
 let capsuleUsed = false;
 let magicUsed = false;
 let offeredMagicCards = [];
+
+let ufoActive = false;
+let ufoUsed = false;
+let ufoClawX = 250;
+let ufoPrizes = [];
 
 const WORLD_WIDTH = 3000;
 const GAME_WIDTH = 1000;
 const GAME_HEIGHT = 360;
 const MINI_COST = 1;
 const MAX_CARDS = 5;
+const MAX_UPGRADE = 3;
 
 const config = {
     type: Phaser.AUTO,
@@ -33,27 +40,29 @@ const config = {
 
 new Phaser.Game(config);
 
-let p1 = {
-    gold:30,
-    coin:5,
-    cards:[],
-    gTimer:0,
-    cTimer:0,
-    gSpeed:10000,
-    cSpeed:30000,
-    laneIdx:0
-};
+let p1 = createPlayerData();
+let p2 = createPlayerData();
 
-let p2 = {
-    gold:30,
-    coin:5,
-    cards:[],
-    gTimer:0,
-    cTimer:0,
-    gSpeed:10000,
-    cSpeed:30000,
-    laneIdx:0
-};
+function createPlayerData(){
+    return {
+        gold:30,
+        coin:5,
+        cards:[],
+        upgrades:{
+            gold:0,
+            melee:0,
+            archer:0,
+            cavalry:0,
+            tank:0,
+            mage:0
+        },
+        gTimer:0,
+        cTimer:0,
+        gSpeed:10000,
+        cSpeed:30000,
+        laneIdx:0
+    };
+}
 
 const MINI_REWARDS = [
     {name:'꽝', weight:15, gold:0, units:[]},
@@ -77,6 +86,16 @@ const MAGIC_CARDS = [
     {id:'stun', name:'정지', desc:'적 유닛 전체 3초 행동불능'}
 ];
 
+const UFO_REWARDS = [
+    {id:'gold', label:'골드+1', color:'#ffd700'},
+    {id:'melee', label:'병+1', color:'#66ff66'},
+    {id:'archer', label:'궁+1', color:'#66ffff'},
+    {id:'cavalry', label:'기+1', color:'#ff66ff'},
+    {id:'tank', label:'탱+1', color:'#aaaaaa'},
+    {id:'mage', label:'마+1', color:'#ffff66'},
+    {id:'hero', label:'★영웅', color:'#ffcc00'}
+];
+
 function create(){
 
     sceneRef = this;
@@ -93,6 +112,7 @@ function create(){
 
     this.cursors = this.input.keyboard.createCursorKeys();
     this.escKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
     this.base1 = this.add.rectangle(50,150,40,80,0x0000ff);
     this.base1.hp = 2000;
@@ -113,6 +133,7 @@ function create(){
     this.graphics.setDepth(25);
 
     renderCards();
+    renderUpgrades();
 }
 
 function update(time, delta){
@@ -125,18 +146,22 @@ function update(time, delta){
         }
     }
 
+    updateUfoInput();
+
     if(gameEnded || gamePaused){
         return;
     }
 
     this.minimap.scrollX = this.cameras.main.scrollX;
 
-    if(this.cursors.left.isDown){
-        this.cameras.main.scrollX -= 10;
-    }
+    if(!ufoActive){
+        if(this.cursors.left.isDown){
+            this.cameras.main.scrollX -= 10;
+        }
 
-    if(this.cursors.right.isDown){
-        this.cameras.main.scrollX += 10;
+        if(this.cursors.right.isDown){
+            this.cameras.main.scrollX += 10;
+        }
     }
 
     updateResource(p1, delta);
@@ -224,7 +249,7 @@ function update(time, delta){
                         let pushPower = 12;
 
                         if(u.type === 'cavalry'){
-                            pushPower = 24;
+                            pushPower = 24 + getPlayerData(u.team).upgrades.cavalry * 5;
                         }
 
                         target.x += u.team === 1 ? pushPower : -pushPower;
@@ -247,6 +272,12 @@ function update(time, delta){
 
     checkGameOver(this);
 }
+
+function getPlayerData(team){
+    return team === 1 ? p1 : p2;
+}
+
+// ===== 공격 =====
 
 function canPushTarget(u, target){
 
@@ -271,8 +302,6 @@ function updateUnitVisual(u){
         u.heroMark.setPosition(u.x, u.y - 3);
     }
 }
-
-// ===== 일반 공격 =====
 
 function slash(scene, u, t){
 
@@ -334,8 +363,6 @@ function shoot(scene, u, t){
         }
     });
 }
-
-// ===== 영웅 공격 =====
 
 function heroSlash(scene, u){
 
@@ -636,6 +663,8 @@ function showHeal(scene, t, amount){
         }
     ).setOrigin(0.5);
 
+    txt.setDepth(40);
+
     scene.tweens.add({
         targets:txt,
         y:t.y - 65,
@@ -685,12 +714,7 @@ function castMagic(scene, u, firstTarget){
 
         let extendedRange = u.stats.range * 1.3;
 
-        let finalTarget = findMagicTarget(
-            scene,
-            u,
-            firstTarget,
-            extendedRange
-        );
+        let finalTarget = findMagicTarget(scene, u, firstTarget, extendedRange);
 
         u.isCharging = false;
         u.lastAttack = scene.time.now;
@@ -765,10 +789,12 @@ function findMagicTarget(scene, u, firstTarget, extendedRange){
 
 function explode(scene, x, y, dmg, team){
 
+    let radius = 60 + getPlayerData(team).upgrades.mage * 10;
+
     let g = scene.add.graphics();
 
     g.fillStyle(0xff4400, 0.7);
-    g.fillCircle(x, y, 60);
+    g.fillCircle(x, y, radius);
 
     scene.tweens.add({
         targets:g,
@@ -782,7 +808,7 @@ function explode(scene, x, y, dmg, team){
         if(
             e.active &&
             e.team !== team &&
-            Phaser.Math.Distance.Between(x, y, e.x, e.y) < 60
+            Phaser.Math.Distance.Between(x, y, e.x, e.y) < radius
         ){
             e.hp -= dmg;
             showDmg(scene, e, dmg);
@@ -797,20 +823,20 @@ function explode(scene, x, y, dmg, team){
 
     if(
         enemyBase.active &&
-        Phaser.Math.Distance.Between(x, y, enemyBase.x, enemyBase.y) < 60
+        Phaser.Math.Distance.Between(x, y, enemyBase.x, enemyBase.y) < radius
     ){
         enemyBase.hp -= dmg;
         showDmg(scene, enemyBase, dmg);
     }
 }
 
-// ===== 플레이어 마법 카드 =====
+// ===== 카드 마법 =====
 
 window.useCard = function(team, index){
 
     if(gameEnded || gamePaused) return;
 
-    let p = team === 1 ? p1 : p2;
+    let p = getPlayerData(team);
 
     let card = p.cards[index];
 
@@ -825,25 +851,11 @@ window.useCard = function(team, index){
 
 function castPlayerMagic(team, card){
 
-    if(card.id === 'heal'){
-        castHealCard(team);
-    }
-
-    if(card.id === 'blast'){
-        castBlastCard(team);
-    }
-
-    if(card.id === 'delete'){
-        castDeleteCard(team);
-    }
-
-    if(card.id === 'return'){
-        castReturnCard(team);
-    }
-
-    if(card.id === 'stun'){
-        castStunCard(team);
-    }
+    if(card.id === 'heal') castHealCard(team);
+    if(card.id === 'blast') castBlastCard(team);
+    if(card.id === 'delete') castDeleteCard(team);
+    if(card.id === 'return') castReturnCard(team);
+    if(card.id === 'stun') castStunCard(team);
 }
 
 function getAllies(team){
@@ -884,18 +896,6 @@ function castHealCard(team){
         remain -= heal;
 
         showHeal(sceneRef, u, heal);
-    });
-
-    let baseX = team === 1 ? 120 : 2880;
-
-    let fx = sceneRef.add.circle(baseX, 150, 50, 0x66ff66, 0.45);
-
-    sceneRef.tweens.add({
-        targets:fx,
-        scale:5,
-        alpha:0,
-        duration:700,
-        onComplete:()=>fx.destroy()
     });
 }
 
@@ -958,16 +958,6 @@ function castReturnCard(team){
             targetX = 2880 - (i % 5) * 35;
         }
 
-        let fx = sceneRef.add.circle(e.x, e.y, 18, 0xffffff, 0.7);
-
-        sceneRef.tweens.add({
-            targets:fx,
-            alpha:0,
-            scale:2,
-            duration:300,
-            onComplete:()=>fx.destroy()
-        });
-
         e.x = targetX;
         e.body.setVelocityX(0);
         e.stopUntil = sceneRef.time.now + 500;
@@ -1014,35 +1004,295 @@ function castStunCard(team){
     });
 }
 
-function renderCards(){
+// ===== 유닛 생성 / 업그레이드 =====
 
-    renderPlayerCards(1, p1);
-    renderPlayerCards(2, p2);
+window.spawnUnitUI = function(team, type){
+
+    if(gameEnded || gamePaused) return;
+
+    let stats = UNIT_STATS[type];
+    let p = getPlayerData(team);
+
+    if(p.gold >= stats.cost){
+        p.gold -= stats.cost;
+        spawnUnitFree(team, type);
+    }
 }
 
-function renderPlayerCards(team, p){
+function spawnUnitFree(team, type){
 
-    let el = document.getElementById('cards' + team);
+    let p = getPlayerData(team);
 
-    if(!el) return;
+    let u = createUnit(
+        sceneRef,
+        team === 1 ? 100 : 2900,
+        team,
+        type,
+        p
+    );
 
-    el.innerHTML = '';
+    applyUnitUpgradeStats(u);
 
-    p.cards.forEach((card, index)=>{
+    sceneRef.allUnits.push(u);
+}
 
-        let btn = document.createElement('button');
+function spawnUnitSet(team, type, count){
 
-        btn.className = 'card-btn';
-        btn.innerText = card.name;
-        btn.title = card.desc;
-        btn.onclick = ()=>window.useCard(team, index);
+    for(let i=0; i<count; i++){
+        sceneRef.time.delayedCall(i * 180, ()=>{
+            if(!gameEnded){
+                spawnUnitFree(team, type);
+            }
+        });
+    }
+}
 
-        el.appendChild(btn);
+function applyUnitUpgradeStats(u){
+
+    let up = getPlayerData(u.team).upgrades;
+
+    if(u.type === 'melee'){
+        u.stats = {...u.stats};
+        u.stats.dmg += up.melee * 5;
+    }
+
+    if(u.type === 'archer'){
+        u.stats = {...u.stats};
+        u.stats.range += up.archer * 5;
+    }
+
+    if(u.type === 'cavalry'){
+        u.stats = {...u.stats};
+        let addHp = up.cavalry * 30;
+        u.maxHp += addHp;
+        u.hp += addHp;
+    }
+
+    if(u.type === 'tank'){
+        u.stats = {...u.stats};
+        let addHp = up.tank * 100;
+        u.maxHp += addHp;
+        u.hp += addHp;
+    }
+
+    if(u.type === 'mage'){
+        u.stats = {...u.stats};
+    }
+}
+
+function applyUpgradeToExistingUnits(team, kind){
+
+    sceneRef.allUnits.forEach(u=>{
+
+        if(!u.active || u.team !== team) return;
+
+        if(kind === 'melee' && u.type === 'melee'){
+            u.stats = {...u.stats};
+            u.stats.dmg += 5;
+        }
+
+        if(kind === 'archer' && u.type === 'archer'){
+            u.stats = {...u.stats};
+            u.stats.range += 5;
+        }
+
+        if(kind === 'cavalry' && u.type === 'cavalry'){
+            u.maxHp += 30;
+            u.hp += 30;
+        }
+
+        if(kind === 'tank' && u.type === 'tank'){
+            u.maxHp += 100;
+            u.hp += 100;
+        }
+    });
+}
+
+function addUpgrade(team, kind){
+
+    let p = getPlayerData(team);
+
+    if(kind === 'hero'){
+        let heroes = ['heroMelee', 'heroRanged', 'heroHealer'];
+        let hero = heroes[Math.floor(Math.random() * heroes.length)];
+        spawnUnitFree(team, hero);
+        return '영웅 획득!';
+    }
+
+    if(p.upgrades[kind] >= MAX_UPGRADE){
+        return '이미 최대 강화입니다.';
+    }
+
+    p.upgrades[kind]++;
+
+    applyUpgradeToExistingUnits(team, kind);
+
+    renderUpgrades();
+
+    return '강화 성공!';
+}
+
+// ===== UFO 캐쳐 =====
+
+window.selectUfoGame = function(){
+
+    document.getElementById('mini-select-screen').style.display = 'none';
+    document.getElementById('capsule-screen').style.display = 'none';
+    document.getElementById('magic-screen').style.display = 'none';
+    document.getElementById('ufo-screen').style.display = 'block';
+
+    document.getElementById('ufo-result').innerText =
+        '시작 버튼을 누르면 코인 1개를 사용합니다.';
+
+    resetUfoBoard();
+}
+
+window.startUfoGame = function(){
+
+    if(ufoUsed) return;
+
+    let p = getPlayerData(currentMiniTeam);
+
+    if(p.coin < MINI_COST){
+        document.getElementById('ufo-result').innerText = '코인이 부족합니다.';
+        return;
+    }
+
+    p.coin -= MINI_COST;
+    ufoUsed = true;
+    ufoActive = true;
+    ufoClawX = 250;
+
+    document.getElementById('ufo-result').innerText =
+        '좌우 방향키로 이동, 스페이스로 잡기!';
+
+    resetUfoBoard();
+}
+
+function resetUfoBoard(){
+
+    ufoActive = false;
+    ufoClawX = 250;
+    ufoPrizes = [];
+
+    let area = document.getElementById('ufo-area');
+    area.querySelectorAll('.ufo-prize').forEach(e=>e.remove());
+
+    document.getElementById('ufo-claw').style.left = ufoClawX + 'px';
+}
+
+function createUfoPrizes(){
+
+    let area = document.getElementById('ufo-area');
+    area.querySelectorAll('.ufo-prize').forEach(e=>e.remove());
+
+    ufoPrizes = [];
+
+    let rewards = [...UFO_REWARDS];
+
+    for(let i=0; i<6; i++){
+
+        let reward = rewards[Math.floor(Math.random() * rewards.length)];
+
+        let x = 40 + i * 78 + Math.floor(Math.random() * 20);
+        let y = 108 + Math.floor(Math.random() * 10);
+
+        let el = document.createElement('div');
+        el.className = 'ufo-prize';
+        el.innerText = reward.label;
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        el.style.background = reward.color;
+
+        area.appendChild(el);
+
+        ufoPrizes.push({
+            x:x + 26,
+            y:y + 26,
+            reward,
+            el
+        });
+    }
+}
+
+function updateUfoInput(){
+
+    if(!sceneRef || !ufoActive) return;
+
+    if(sceneRef.cursors.left.isDown){
+        ufoClawX -= 5;
+    }
+
+    if(sceneRef.cursors.right.isDown){
+        ufoClawX += 5;
+    }
+
+    if(ufoClawX < 0) ufoClawX = 0;
+    if(ufoClawX > 472) ufoClawX = 472;
+
+    document.getElementById('ufo-claw').style.left = ufoClawX + 'px';
+
+    if(Phaser.Input.Keyboard.JustDown(sceneRef.spaceKey)){
+        dropUfoClaw();
+    }
+}
+
+function dropUfoClaw(){
+
+    if(!ufoActive) return;
+
+    ufoActive = false;
+
+    let clawCenter = ufoClawX + 24;
+
+    let best = null;
+    let bestDist = 9999;
+
+    ufoPrizes.forEach(p=>{
+
+        let d = Math.abs(p.x - clawCenter);
+
+        if(d < bestDist){
+            bestDist = d;
+            best = p;
+        }
     });
 
-    if(p.cards.length === 0){
-        el.innerText = '없음';
+    let chance = 0;
+
+    if(bestDist <= 15){
+        chance = 0.9;
+    }else if(bestDist <= 30){
+        chance = 0.6;
+    }else if(bestDist <= 45){
+        chance = 0.3;
     }
+
+    let success = Math.random() < chance;
+
+    if(!best || !success){
+        document.getElementById('ufo-result').innerText =
+            '실패! 너무 빗나갔습니다.';
+        return;
+    }
+
+    best.el.style.transform = 'translateY(-60px)';
+    best.el.style.opacity = '0.4';
+
+    let msg = addUpgrade(currentMiniTeam, best.reward.id);
+
+    document.getElementById('ufo-result').innerText =
+        best.reward.label + ' 획득!\n' + msg;
+}
+
+function prepareUfoStart(){
+    createUfoPrizes();
+}
+
+function openUfoFresh(){
+    ufoUsed = false;
+    resetUfoBoard();
+    createUfoPrizes();
 }
 
 // ===== 공통 =====
@@ -1123,7 +1373,7 @@ function updateResource(p, delta){
     p.cTimer += delta;
 
     if(p.gTimer >= p.gSpeed){
-        p.gold += 5;
+        p.gold += 5 + p.upgrades.gold;
         p.gTimer = 0;
     }
 
@@ -1178,47 +1428,6 @@ function findTarget(u, units, base){
     }
 
     return target;
-}
-
-// ===== 유닛 생성 =====
-
-window.spawnUnitUI = function(team, type){
-
-    if(gameEnded || gamePaused) return;
-
-    let stats = UNIT_STATS[type];
-    let p = team === 1 ? p1 : p2;
-
-    if(p.gold >= stats.cost){
-        p.gold -= stats.cost;
-        spawnUnitFree(team, type);
-    }
-}
-
-function spawnUnitFree(team, type){
-
-    let p = team === 1 ? p1 : p2;
-
-    let u = createUnit(
-        sceneRef,
-        team === 1 ? 100 : 2900,
-        team,
-        type,
-        p
-    );
-
-    sceneRef.allUnits.push(u);
-}
-
-function spawnUnitSet(team, type, count){
-
-    for(let i=0; i<count; i++){
-        sceneRef.time.delayedCall(i * 180, ()=>{
-            if(!gameEnded){
-                spawnUnitFree(team, type);
-            }
-        });
-    }
 }
 
 function killUnit(u){
@@ -1320,14 +1529,18 @@ window.openMiniGame = function(team){
     currentMiniTeam = team;
     capsuleUsed = false;
     magicUsed = false;
+    ufoUsed = false;
+    ufoActive = false;
     offeredMagicCards = [];
 
     document.getElementById('mini-select-screen').style.display = 'block';
     document.getElementById('capsule-screen').style.display = 'none';
     document.getElementById('magic-screen').style.display = 'none';
+    document.getElementById('ufo-screen').style.display = 'none';
 
     document.getElementById('mini-result').innerText = '';
     document.getElementById('magic-result').innerText = '';
+    document.getElementById('ufo-result').innerText = '';
     document.getElementById('capsule-glass').innerText = '?';
 
     document.querySelectorAll('.magic-card').forEach((card, i)=>{
@@ -1335,7 +1548,14 @@ window.openMiniGame = function(team){
         card.style.pointerEvents = 'auto';
     });
 
+    resetUfoBoard();
+
     document.getElementById('mini-game-popup').style.display = 'flex';
+}
+
+window.closeMiniGame = function(){
+    ufoActive = false;
+    document.getElementById('mini-game-popup').style.display = 'none';
 }
 
 window.selectCapsuleGame = function(){
@@ -1343,18 +1563,21 @@ window.selectCapsuleGame = function(){
     document.getElementById('mini-select-screen').style.display = 'none';
     document.getElementById('capsule-screen').style.display = 'block';
     document.getElementById('magic-screen').style.display = 'none';
+    document.getElementById('ufo-screen').style.display = 'none';
+
     document.getElementById('mini-result').innerText =
         'P' + currentMiniTeam + ' 레버를 돌려주세요.';
 }
 
 window.selectMagicGame = function(){
 
-    let p = currentMiniTeam === 1 ? p1 : p2;
+    let p = getPlayerData(currentMiniTeam);
 
     if(p.cards.length >= MAX_CARDS){
         document.getElementById('mini-select-screen').style.display = 'none';
         document.getElementById('capsule-screen').style.display = 'none';
         document.getElementById('magic-screen').style.display = 'block';
+        document.getElementById('ufo-screen').style.display = 'none';
         document.getElementById('magic-result').innerText =
             '카드 보유 한도입니다. 먼저 카드를 사용하세요.';
         return;
@@ -1366,6 +1589,7 @@ window.selectMagicGame = function(){
     document.getElementById('mini-select-screen').style.display = 'none';
     document.getElementById('capsule-screen').style.display = 'none';
     document.getElementById('magic-screen').style.display = 'block';
+    document.getElementById('ufo-screen').style.display = 'none';
 
     document.querySelectorAll('.magic-card').forEach((el, i)=>{
         el.innerText = '카드 ' + (i + 1) + '\n?';
@@ -1390,15 +1614,11 @@ function getUniqueMagicCards(count){
     return pool.slice(0, count);
 }
 
-window.closeMiniGame = function(){
-    document.getElementById('mini-game-popup').style.display = 'none';
-}
-
 window.pullCapsule = function(){
 
     if(capsuleUsed) return;
 
-    let p = currentMiniTeam === 1 ? p1 : p2;
+    let p = getPlayerData(currentMiniTeam);
 
     if(p.coin < MINI_COST){
         document.getElementById('mini-result').innerText =
@@ -1430,7 +1650,7 @@ window.pickMagicCard = function(index){
 
     if(magicUsed) return;
 
-    let p = currentMiniTeam === 1 ? p1 : p2;
+    let p = getPlayerData(currentMiniTeam);
 
     if(p.cards.length >= MAX_CARDS){
         document.getElementById('magic-result').innerText =
@@ -1491,7 +1711,7 @@ function getRandomReward(){
 
 function applyReward(team, reward){
 
-    let p = team === 1 ? p1 : p2;
+    let p = getPlayerData(team);
 
     if(reward.gold){
         p.gold += reward.gold;
@@ -1503,6 +1723,58 @@ function applyReward(team, reward){
 
         spawnUnitSet(team, type, count);
     });
+}
+
+function renderCards(){
+
+    renderPlayerCards(1, p1);
+    renderPlayerCards(2, p2);
+}
+
+function renderPlayerCards(team, p){
+
+    let el = document.getElementById('cards' + team);
+
+    if(!el) return;
+
+    el.innerHTML = '';
+
+    p.cards.forEach((card, index)=>{
+
+        let btn = document.createElement('button');
+
+        btn.className = 'card-btn';
+        btn.innerText = card.name;
+        btn.title = card.desc;
+        btn.onclick = ()=>window.useCard(team, index);
+
+        el.appendChild(btn);
+    });
+
+    if(p.cards.length === 0){
+        el.innerText = '없음';
+    }
+}
+
+function renderUpgrades(){
+
+    renderPlayerUpgrades(1, p1);
+    renderPlayerUpgrades(2, p2);
+}
+
+function renderPlayerUpgrades(team, p){
+
+    let el = document.getElementById('upgrades' + team);
+
+    if(!el) return;
+
+    el.innerText =
+        '골드+' + p.upgrades.gold +
+        ' 병' + p.upgrades.melee +
+        ' 궁' + p.upgrades.archer +
+        ' 기' + p.upgrades.cavalry +
+        ' 탱' + p.upgrades.tank +
+        ' 마' + p.upgrades.mage;
 }
 
 // ===== 툴팁 =====
