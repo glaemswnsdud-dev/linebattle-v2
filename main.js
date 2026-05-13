@@ -72,6 +72,9 @@ function preload(){
     this.load.image('explosion_1', 'assets/explosion_1.png');
     this.load.image('explosion_2', 'assets/explosion_2.png');
 
+    this.load.image('heal_1', 'assets/heal_1.png');
+    this.load.image('heal_2', 'assets/heal_2.png');
+
     this.load.image('fishing_success', 'assets/fishing_success.png');
     this.load.image('fishing_fail', 'assets/fishing_fail.png');
 
@@ -83,7 +86,7 @@ function preload(){
     loadUnitImages(this, 'bulldozer');
 
     loadUnitImages(this, 'heroMelee');
-    loadUnitImages(this, 'heroRanged');
+    loadUnitImages(this, 'heroranged');
     loadUnitImages(this, 'heroHealer');
 
     loadUnitImages(this, 'kimwon');
@@ -109,7 +112,7 @@ function create(){
 
     [
         'soldier','archer','tank','mage','cavalry','bulldozer',
-        'heroMelee','heroRanged','heroHealer','kimwon'
+        'heroMelee','heroranged','heroHealer','kimwon'
     ].forEach(prefix=>{
         ['idle','walk1','walk2','attack1','attack2','dead'].forEach(action=>{
             let key = prefix + '_' + action;
@@ -319,20 +322,16 @@ window.startPracticeMode = function(){
     state.started = true;
     state.mode    = 'practice';
 
-    // 연습 모드 거점 체력 : 5000
     setBaseHP(5000);
 
-    // 불도저 버튼 표시
     const bd1 = document.getElementById('p1-bulldozer-btn');
     const bd2 = document.getElementById('p2-bulldozer-btn');
     if(bd1) bd1.style.display = 'inline-block';
     if(bd2) bd2.style.display = 'inline-block';
 
-    // P2 미니게임 버튼 표시
     const p2Mini = document.getElementById('p2-mini-btn');
     if(p2Mini) p2Mini.style.display = 'inline-block';
 
-    // P2 버튼 활성화
     setP2ButtonsDisabled(false);
 
     updateUI(state);
@@ -353,20 +352,16 @@ window.startCPUMode = function(){
     state.started = true;
     state.mode    = 'cpu';
 
-    // CPU 모드 거점 체력 : 2000
     setBaseHP(2000);
 
-    // 불도저 버튼 숨기기
     const bd1 = document.getElementById('p1-bulldozer-btn');
     const bd2 = document.getElementById('p2-bulldozer-btn');
     if(bd1) bd1.style.display = 'none';
     if(bd2) bd2.style.display = 'none';
 
-    // P2 미니게임 버튼 숨기기
     const p2Mini = document.getElementById('p2-mini-btn');
     if(p2Mini) p2Mini.style.display = 'none';
 
-    // P2 버튼 비활성화
     setP2ButtonsDisabled(true);
 
     updateUI(state);
@@ -380,9 +375,7 @@ window.startDebugMode = window.startPracticeMode;
 window.spawnUnitUI = function(team, type){
 
     if(state.gameEnded || state.gamePaused) return;
-
-    // CPU 모드에서 P2 조작 차단
-    if(state.mode === 'cpu' && team === 2) return;
+    if(state.mode === 'cpu' && team === 2)  return;
 
     let stats = UNIT_STATS[type];
     if(!stats) return;

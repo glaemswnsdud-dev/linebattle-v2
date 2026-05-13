@@ -130,7 +130,7 @@ function getSpritePrefix(type){
     if(type === 'bulldozer')  return 'bulldozer';
 
     if(type === 'heroMelee')  return 'heroMelee';
-    if(type === 'heroRanged') return 'heroRanged';
+    if(type === 'heroRanged') return 'heroranged';  // 소문자
     if(type === 'heroHealer') return 'heroHealer';
 
     if(type === 'kimwon')     return 'kimwon';
@@ -191,9 +191,7 @@ export function createUnit(scene, x, team, type, pData){
 
     let size = stats.hero ? 42 : 30;
 
-    if(stats.bulldozer){
-        size = 46;
-    }
+    if(stats.bulldozer) size = 46;
 
     let u;
     let spritePrefix = getSpritePrefix(type);
@@ -216,9 +214,7 @@ export function createUnit(scene, x, team, type, pData){
             forceTexture:null
         };
 
-        if(team === 2){
-            u.setFlipX(true);
-        }
+        if(team === 2) u.setFlipX(true);
 
     }else{
 
@@ -252,11 +248,11 @@ export function createUnit(scene, x, team, type, pData){
         y - nameOffset,
         stats.name,
         {
-            fontSize:      stats.hero ? '16px' : '14px',
-            color:         stats.hero ? '#ffd700' : '#ffffff',
-            stroke:        '#000000',
+            fontSize:        stats.hero ? '16px' : '14px',
+            color:           stats.hero ? '#ffd700' : '#ffffff',
+            stroke:          '#000000',
             strokeThickness: 3,
-            fontStyle:     stats.hero ? 'bold' : 'normal'
+            fontStyle:       stats.hero ? 'bold' : 'normal'
         }
     ).setOrigin(0.5);
 

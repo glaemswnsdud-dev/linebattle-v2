@@ -30,7 +30,18 @@
     <div class="htm-content">
 
         <div class="htm-section">
-            <div class="htm-label">■ 제작</div>
+            <div class="htm-label">&#9632; 발단</div>
+            <div class="htm-text">
+                AI로 60분만에 록맨 파워 더 배틀 만들기란 동영상을 보고 무작정 따라해봄.<br>
+                하루나 이틀 정도면 뭐라도 만들겠지 싶었음.<br>
+                <a href="https://youtu.be/aEJqs4RqomU?si=lD7MvtF-R9K4BG6x" target="_blank" class="htm-link">
+                    &#128250; 참고 영상 보기
+                </a>
+            </div>
+        </div>
+
+        <div class="htm-section">
+            <div class="htm-label">&#9632; 제작</div>
             <div class="htm-text">
                 VS Code를 이용하여 웹 실행 기반으로 GPT가 코드를 짜준 것으로 진행.<br>
                 코드를 받고 적용하는 건 시간이 그렇게 걸리지 않으나, 중후반 코드가 늘어나니
@@ -44,7 +55,7 @@
         </div>
 
         <div class="htm-section">
-            <div class="htm-label">■ 그래픽</div>
+            <div class="htm-label">&#9632; 그래픽</div>
             <div class="htm-text">
                 이미지는 스테이블 디퓨전으로 작업하려고 솔루션을 받았으나,
                 PC 성능도 부족하고 브라우저와 게임을 포함한 실행 프로그램을 닫아서
@@ -54,7 +65,7 @@
         </div>
 
         <div class="htm-section">
-            <div class="htm-label">■ 웹 배포</div>
+            <div class="htm-label">&#9632; 웹 배포</div>
             <div class="htm-text">
                 깃허브를 통해서 링크로 웹 환경에서 실행할 수 있도록 GPT가 안내해줘서
                 깃허브 가입 및 설정 진행.
@@ -62,7 +73,7 @@
         </div>
 
         <div class="htm-section">
-            <div class="htm-label">■ 기타 소감</div>
+            <div class="htm-label">&#9632; 기타 소감</div>
             <div class="htm-text">
                 배경을 회사 5층 회의실로 하려고 했으나 SEGA 로고 같은 게 있어서 그런지
                 AI가 이미지를 2D 픽셀로 만들어줄 때 자꾸 판타지 수납장 같은 느낌으로 만들어줘서 실패.<br><br>
@@ -78,15 +89,16 @@
         </div>
 
         <div class="htm-section htm-thanks">
-            <div class="htm-label">■ Special Thanks</div>
+            <div class="htm-label">&#9632; Special Thanks</div>
             <div class="htm-text">
+                캐릭터 출연 및 배경이미지 도움 : K-ONE<br>
                 이미지 작업 도움 : 문정X
             </div>
         </div>
 
     </div>
 
-    <button class="htm-back-btn" onclick="hideHowToMake()">← 타이틀로 돌아가기</button>
+    <button class="htm-back-btn" onclick="hideHowToMake()">&#8592; 타이틀로 돌아가기</button>
 </div>
 
 <!-- 게임 화면 -->
@@ -193,16 +205,16 @@
                 <div id="ufo-screen" style="display:none;">
                     <p>조작법 : 버튼으로 집게를 움직이고 상품을 잡으세요.</p>
                     <div class="ufo-controls">
-                        <button id="ufo-left-btn">◀ 왼쪽</button>
+                        <button id="ufo-left-btn">&#9664; 왼쪽</button>
                         <button id="ufo-grab-btn">잡기</button>
-                        <button id="ufo-right-btn">오른쪽 ▶</button>
+                        <button id="ufo-right-btn">오른쪽 &#9654;</button>
                     </div>
                     <div id="ufo-area">
                         <div id="ufo-start-overlay">
                             <button onclick="startUfoGame()">UFO 캐쳐 시작</button>
                             <div>코인 1개 사용</div>
                         </div>
-                        <div id="ufo-claw">╥<br>╩</div>
+                        <div id="ufo-claw">&#9577;<br>&#9578;</div>
                     </div>
                     <div id="ufo-result"></div>
                 </div>
@@ -219,7 +231,7 @@
                         </div>
                         <div id="fish-target"></div>
                         <div id="fish-cursor"></div>
-                        <div id="fish-bite">🐟 물었다!</div>
+                        <div id="fish-bite">&#127903; 물었다!</div>
                     </div>
                     <div class="fish-controls">
                         <button id="fish-practice-success" onclick="forceFishSuccess()">연습 성공</button>
@@ -242,7 +254,7 @@
     </div>
 
     <div id="control-guide">
-        조작키 안내 : ← / → 화면 이동　|　ESC : 일시정지　|　미니게임 : 코인 1개 사용
+        조작키 안내 : &#8592; / &#8594; 화면 이동 | ESC : 일시정지 | 미니게임 : 코인 1개 사용
     </div>
 
     <div class="ui-wrap">
@@ -259,45 +271,33 @@
             <div class="hp-box">거점 체력 : <span id="hp1">2000</span></div>
 
             <div class="unit-row" id="p1-unit-row">
-                <button class="btn-gold unit-btn" data-info="병사
-체력 : 100
-공격력 : 20
-공격속도 : 1.4초
-특징 : 기본 근접 / 밀치기 가능" onclick="spawnUnitUI(1,'melee')">병(3)</button>
+                <button class="btn-gold unit-btn"
+                data-info="병사&#10;체력 : 100&#10;공격력 : 20&#10;공격속도 : 1.4초&#10;특징 : 기본 근접 / 밀치기 가능"
+                onclick="spawnUnitUI(1,'melee')">병(3)</button>
 
-                <button class="btn-gold unit-btn" data-info="궁수
-체력 : 70
-공격력 : 15
-사거리 : 200
-특징 : 원거리 공격" onclick="spawnUnitUI(1,'archer')">궁(4)</button>
+                <button class="btn-gold unit-btn"
+                data-info="궁수&#10;체력 : 70&#10;공격력 : 15&#10;사거리 : 200&#10;특징 : 원거리 공격"
+                onclick="spawnUnitUI(1,'archer')">궁(4)</button>
 
-                <button class="btn-gold unit-btn" data-info="기병
-체력 : 200
-공격력 : 20
-특징 : 빠른 이동 / 강한 밀치기" onclick="spawnUnitUI(1,'cavalry')">기(7)</button>
+                <button class="btn-gold unit-btn"
+                data-info="기병&#10;체력 : 200&#10;공격력 : 20&#10;특징 : 빠른 이동 / 강한 밀치기"
+                onclick="spawnUnitUI(1,'cavalry')">기(7)</button>
 
-                <button class="btn-gold unit-btn" data-info="탱커
-체력 : 600
-공격력 : 15
-특징 : 밀치기 면역" onclick="spawnUnitUI(1,'tank')">탱(8)</button>
+                <button class="btn-gold unit-btn"
+                data-info="탱커&#10;체력 : 600&#10;공격력 : 15&#10;특징 : 밀치기 면역"
+                onclick="spawnUnitUI(1,'tank')">탱(8)</button>
 
-                <button class="btn-gold unit-btn" data-info="마법사
-체력 : 50
-공격력 : 30
-특징 : 3초 차징 후 광역 폭발" onclick="spawnUnitUI(1,'mage')">마(7)</button>
+                <button class="btn-gold unit-btn"
+                data-info="마법사&#10;체력 : 50&#10;공격력 : 30&#10;특징 : 3초 차징 후 광역 폭발"
+                onclick="spawnUnitUI(1,'mage')">마(7)</button>
 
-                <button class="btn-gold unit-btn" data-info="김원
-체력 : 1200
-공격력 : 180
-공격속도 : 매우 느림
-비용 : 20골드
-특징 : 키보드로 직접 내려치는 공모전 스페셜 유닛" onclick="spawnUnitUI(1,'kimwon')">김원(20)</button>
+                <button class="btn-gold unit-btn"
+                data-info="김원&#10;체력 : 1200&#10;공격력 : 180&#10;공격속도 : 매우 느림&#10;비용 : 20골드&#10;특징 : 공모전 스페셜 유닛"
+                onclick="spawnUnitUI(1,'kimwon')">김원(20)</button>
 
                 <button class="btn-gold unit-btn" id="p1-bulldozer-btn" style="display:none;"
-                data-info="폭탄 불도저
-체력 : 900
-비용 : 10골드
-특징 : 적진 돌진 후 자폭 / 적 기지에 막대한 피해" onclick="spawnUnitUI(1,'bulldozer')">불도저(10)</button>
+                data-info="폭탄 불도저&#10;체력 : 900&#10;비용 : 10골드&#10;특징 : 적진 돌진 후 자폭"
+                onclick="spawnUnitUI(1,'bulldozer')">불도저(10)</button>
 
                 <button class="btn-coin" onclick="openMiniGame(1)">미니게임</button>
             </div>
@@ -323,45 +323,33 @@
             <div class="unit-row" id="p2-unit-row">
                 <button class="btn-coin" id="p2-mini-btn" onclick="openMiniGame(2)">미니게임</button>
 
-                <button class="btn-gold unit-btn" data-info="김원
-체력 : 1200
-공격력 : 180
-공격속도 : 매우 느림
-비용 : 20골드
-특징 : 키보드로 직접 내려치는 공모전 스페셜 유닛" onclick="spawnUnitUI(2,'kimwon')">김원(20)</button>
+                <button class="btn-gold unit-btn"
+                data-info="김원&#10;체력 : 1200&#10;공격력 : 180&#10;공격속도 : 매우 느림&#10;비용 : 20골드&#10;특징 : 공모전 스페셜 유닛"
+                onclick="spawnUnitUI(2,'kimwon')">김원(20)</button>
 
-                <button class="btn-gold unit-btn" data-info="마법사
-체력 : 50
-공격력 : 30
-특징 : 3초 차징 후 광역 폭발" onclick="spawnUnitUI(2,'mage')">마(7)</button>
+                <button class="btn-gold unit-btn"
+                data-info="마법사&#10;체력 : 50&#10;공격력 : 30&#10;특징 : 3초 차징 후 광역 폭발"
+                onclick="spawnUnitUI(2,'mage')">마(7)</button>
 
-                <button class="btn-gold unit-btn" data-info="탱커
-체력 : 600
-공격력 : 15
-특징 : 밀치기 면역" onclick="spawnUnitUI(2,'tank')">탱(8)</button>
+                <button class="btn-gold unit-btn"
+                data-info="탱커&#10;체력 : 600&#10;공격력 : 15&#10;특징 : 밀치기 면역"
+                onclick="spawnUnitUI(2,'tank')">탱(8)</button>
 
-                <button class="btn-gold unit-btn" data-info="기병
-체력 : 200
-공격력 : 20
-특징 : 빠른 이동 / 강한 밀치기" onclick="spawnUnitUI(2,'cavalry')">기(7)</button>
+                <button class="btn-gold unit-btn"
+                data-info="기병&#10;체력 : 200&#10;공격력 : 20&#10;특징 : 빠른 이동 / 강한 밀치기"
+                onclick="spawnUnitUI(2,'cavalry')">기(7)</button>
 
-                <button class="btn-gold unit-btn" data-info="궁수
-체력 : 70
-공격력 : 15
-사거리 : 200
-특징 : 원거리 공격" onclick="spawnUnitUI(2,'archer')">궁(4)</button>
+                <button class="btn-gold unit-btn"
+                data-info="궁수&#10;체력 : 70&#10;공격력 : 15&#10;사거리 : 200&#10;특징 : 원거리 공격"
+                onclick="spawnUnitUI(2,'archer')">궁(4)</button>
 
-                <button class="btn-gold unit-btn" data-info="병사
-체력 : 100
-공격력 : 20
-공격속도 : 1.4초
-특징 : 기본 근접 / 밀치기 가능" onclick="spawnUnitUI(2,'melee')">병(3)</button>
+                <button class="btn-gold unit-btn"
+                data-info="병사&#10;체력 : 100&#10;공격력 : 20&#10;공격속도 : 1.4초&#10;특징 : 기본 근접 / 밀치기 가능"
+                onclick="spawnUnitUI(2,'melee')">병(3)</button>
 
                 <button class="btn-gold unit-btn" id="p2-bulldozer-btn" style="display:none;"
-                data-info="폭탄 불도저
-체력 : 900
-비용 : 10골드
-특징 : 적진 돌진 후 자폭 / 적 기지에 막대한 피해" onclick="spawnUnitUI(2,'bulldozer')">불도저(10)</button>
+                data-info="폭탄 불도저&#10;체력 : 900&#10;비용 : 10골드&#10;특징 : 적진 돌진 후 자폭"
+                onclick="spawnUnitUI(2,'bulldozer')">불도저(10)</button>
             </div>
 
             <div class="card-row">마법 카드 : <span id="cards2"></span></div>
