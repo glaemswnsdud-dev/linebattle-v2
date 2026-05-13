@@ -664,3 +664,77 @@ button:disabled{
         opacity:1;
     }
 }
+/* ===== How To Make 화면 ===== */
+#howtomake-screen{
+    width:720px;
+    margin:40px auto;
+    padding:35px;
+    background:#111;
+    border:3px solid #ffd700;
+    color:#fff;
+}
+
+#howtomake-screen h2{
+    font-size:32px;
+    color:#ffd700;
+    text-align:center;
+    margin:0 0 24px;
+}
+
+.htm-content{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    margin-bottom:28px;
+}
+
+.htm-section{
+    border-left:3px solid #ffd700;
+    padding-left:14px;
+}
+
+.htm-label{
+    font-size:16px;
+    font-weight:bold;
+    color:#ffd700;
+    margin-bottom:6px;
+}
+
+.htm-text{
+    font-size:14px;
+    line-height:1.8;
+    color:#ddd;
+}
+
+.htm-sub{
+    font-size:12px;
+    color:#aaa;
+    display:block;
+    margin-top:4px;
+}
+
+.htm-thanks{
+    border-left:3px solid #ff9900;
+    margin-top:8px;
+}
+
+.htm-thanks .htm-label{
+    color:#ff9900;
+}
+
+.htm-back-btn{
+    display:block;
+    width:220px;
+    margin:0 auto;
+    padding:12px;
+    font-size:16px;
+    background:#333;
+    color:#fff;
+    border:2px solid #ffd700;
+    cursor:pointer;
+}
+
+.htm-back-btn:hover{
+    background:#ffd700;
+    color:#000;
+}

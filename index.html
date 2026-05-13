@@ -8,6 +8,7 @@
 
 <body>
 
+<!-- 타이틀 화면 -->
 <div id="title-screen">
     <h1>Mini Liner</h1>
 
@@ -17,10 +18,78 @@
         미니게임을 통해 병사, 마법, 업그레이드, 영웅을 획득해보세요.
     </p>
 
-    <button onclick="startPracticeMode()">연습모드(양쪽조작)</button>
-    <button disabled>CPU 대전 모드 - 준비중</button>
+    <button onclick="startPracticeMode()">연습모드 (양쪽 조작)</button>
+    <button onclick="startCPUMode()">CPU 대전 모드</button>
+    <button onclick="showHowToMake()">How To Make?</button>
 </div>
 
+<!-- How To Make 화면 -->
+<div id="howtomake-screen" style="display:none;">
+    <h2>How To Make?</h2>
+
+    <div class="htm-content">
+
+        <div class="htm-section">
+            <div class="htm-label">■ 제작</div>
+            <div class="htm-text">
+                VS Code를 이용하여 웹 실행 기반으로 GPT가 코드를 짜준 것으로 진행.<br>
+                코드를 받고 적용하는 건 시간이 그렇게 걸리지 않으나, 중후반 코드가 늘어나니
+                AI의 사고 처리량이 늘어나서 그런지 코드 받는 데 10분 이상 걸림.<br>
+                약 <strong>20시간</strong> 가량 진행.<br>
+                <span class="htm-sub">
+                    (일부 수정 코드만 받으면 짧지만, 개발자가 아니라 코드 적용할 곳을 찾는 것과
+                    정리하는 것도 시간이 걸려서 복붙할 전체 코드를 받는 식으로 진행)
+                </span>
+            </div>
+        </div>
+
+        <div class="htm-section">
+            <div class="htm-label">■ 그래픽</div>
+            <div class="htm-text">
+                이미지는 스테이블 디퓨전으로 작업하려고 솔루션을 받았으나,
+                PC 성능도 부족하고 브라우저와 게임을 포함한 실행 프로그램을 닫아서
+                VRAM을 최대한 확보하지 않으니 그림 퀄리티가 매우 저조하여 GPT에게 뽑아달라고 함.<br>
+                알파값이 따로 없어 배경 제거 및 이미지 사이즈 줄이기 등은 수동으로 처리.
+            </div>
+        </div>
+
+        <div class="htm-section">
+            <div class="htm-label">■ 웹 배포</div>
+            <div class="htm-text">
+                깃허브를 통해서 링크로 웹 환경에서 실행할 수 있도록 GPT가 안내해줘서
+                깃허브 가입 및 설정 진행.
+            </div>
+        </div>
+
+        <div class="htm-section">
+            <div class="htm-label">■ 기타 소감</div>
+            <div class="htm-text">
+                배경을 회사 5층 회의실로 하려고 했으나 SEGA 로고 같은 게 있어서 그런지
+                AI가 이미지를 2D 픽셀로 만들어줄 때 자꾸 판타지 수납장 같은 느낌으로 만들어줘서 실패.<br><br>
+                미니게임 종류 추가 및 그래픽 작업, SUNO를 통한 사운드도 붙여보고 싶었으나
+                시간상 어려울 듯하여 여기서 마감.<br><br>
+                점점 코드를 받는 데 시간이 오래 걸리고, GPT가 자잘한 히스토리를 까먹어서
+                다음 코드를 받을 때 기존 미니게임이 통째로 날아가는 등
+                본격적인 게임 제작에는 한계가 보임.<br>
+                규모가 커질수록 개발자가 전체적인 빌드를 관리할 필요가 있어 보이며,
+                재미로 진행하거나 간단한 아이디어를 확인하기 위한
+                알파 버전 정도의 제작에만 용이할 듯.
+            </div>
+        </div>
+
+        <div class="htm-section htm-thanks">
+            <div class="htm-label">■ Special Thanks</div>
+            <div class="htm-text">
+                이미지 작업 도움 : 문정X
+            </div>
+        </div>
+
+    </div>
+
+    <button class="htm-back-btn" onclick="hideHowToMake()">← 타이틀로 돌아가기</button>
+</div>
+
+<!-- 게임 화면 -->
 <div id="game-wrapper" style="display:none;">
 
     <div id="game-container">
@@ -36,8 +105,7 @@
 
                     <div class="mini-select-wrap">
 
-                        <button
-                        class="mini-select-btn mini-info"
+                        <button class="mini-select-btn mini-info"
                         data-info="캡슐머신 확률
 꽝 : 25%
 골드 보상 : 20%
@@ -51,8 +119,7 @@
                         캡슐머신<br>유닛 / 골드
                         </button>
 
-                        <button
-                        class="mini-select-btn mini-info"
+                        <button class="mini-select-btn mini-info"
                         data-info="마법 카드 뽑기
 코인 1개 사용
 카드 3장 중 1장 선택
@@ -68,8 +135,7 @@
                         마법 카드<br>카드 선택
                         </button>
 
-                        <button
-                        class="mini-select-btn mini-info"
+                        <button class="mini-select-btn mini-info"
                         data-info="UFO 캐쳐
 코인 1개 사용
 왼쪽 / 오른쪽 / 잡기 버튼으로 조작
@@ -89,8 +155,7 @@
                         UFO 캐쳐<br>강화 뽑기
                         </button>
 
-                        <button
-                        class="mini-select-btn mini-info"
+                        <button class="mini-select-btn mini-info"
                         data-info="영웅 낚시
 코인 1개 사용
 찌가 초록 구간에 들어왔을 때 화면을 클릭하세요.
@@ -107,52 +172,43 @@
 
                 <div id="capsule-screen" style="display:none;">
                     <p>레버를 돌리면 코인 1개를 사용합니다.</p>
-
                     <div class="capsule-machine">
                         <div class="capsule-glass" id="capsule-glass">?</div>
                         <div class="capsule-lever"></div>
                     </div>
-
                     <button onclick="pullCapsule()">레버 돌리기</button>
                     <div id="mini-result"></div>
                 </div>
 
                 <div id="magic-screen" style="display:none;">
                     <p>카드 1장을 선택하면 코인 1개를 사용합니다.</p>
-
                     <div class="magic-card-wrap">
                         <div class="magic-card" onclick="pickMagicCard(0)">?</div>
                         <div class="magic-card" onclick="pickMagicCard(1)">?</div>
                         <div class="magic-card" onclick="pickMagicCard(2)">?</div>
                     </div>
-
                     <div id="magic-result"></div>
                 </div>
 
                 <div id="ufo-screen" style="display:none;">
                     <p>조작법 : 버튼으로 집게를 움직이고 상품을 잡으세요.</p>
-
                     <div class="ufo-controls">
                         <button id="ufo-left-btn">◀ 왼쪽</button>
                         <button id="ufo-grab-btn">잡기</button>
                         <button id="ufo-right-btn">오른쪽 ▶</button>
                     </div>
-
                     <div id="ufo-area">
                         <div id="ufo-start-overlay">
                             <button onclick="startUfoGame()">UFO 캐쳐 시작</button>
                             <div>코인 1개 사용</div>
                         </div>
-
                         <div id="ufo-claw">╥<br>╩</div>
                     </div>
-
                     <div id="ufo-result"></div>
                 </div>
 
                 <div id="fishing-screen" style="display:none;">
                     <p>초록 구간에 찌가 들어왔을 때 화면을 클릭하세요.</p>
-
                     <div id="fish-area" class="fish-ready">
                         <div id="fish-start-overlay">
                             <div>
@@ -161,16 +217,13 @@
                                 다시 클릭하면 낚습니다.
                             </div>
                         </div>
-
                         <div id="fish-target"></div>
                         <div id="fish-cursor"></div>
                         <div id="fish-bite">🐟 물었다!</div>
                     </div>
-
                     <div class="fish-controls">
                         <button id="fish-practice-success" onclick="forceFishSuccess()">연습 성공</button>
                     </div>
-
                     <div id="fish-result"></div>
                 </div>
 
@@ -194,28 +247,18 @@
 
     <div class="ui-wrap">
 
+        <!-- P1 패널 -->
         <div class="panel">
             <h3>P1</h3>
-
             <div class="resource">
                 <div>골드 : <span id="gold1">30</span></div>
                 <div>코인 : <span id="coin1">5</span></div>
             </div>
+            <div class="bar"><div id="g1" class="gold"></div></div>
+            <div class="bar"><div id="c1" class="coin"></div></div>
+            <div class="hp-box">거점 체력 : <span id="hp1">2000</span></div>
 
-            <div class="bar">
-                <div id="g1" class="gold"></div>
-            </div>
-
-            <div class="bar">
-                <div id="c1" class="coin"></div>
-            </div>
-
-            <div class="hp-box">
-                거점 체력 : <span id="hp1">2000</span>
-            </div>
-
-            <div class="unit-row">
-
+            <div class="unit-row" id="p1-unit-row">
                 <button class="btn-gold unit-btn" data-info="병사
 체력 : 100
 공격력 : 20
@@ -250,47 +293,35 @@
 비용 : 20골드
 특징 : 키보드로 직접 내려치는 공모전 스페셜 유닛" onclick="spawnUnitUI(1,'kimwon')">김원(20)</button>
 
+                <button class="btn-gold unit-btn" id="p1-bulldozer-btn" style="display:none;"
+                data-info="폭탄 불도저
+체력 : 900
+비용 : 10골드
+특징 : 적진 돌진 후 자폭 / 적 기지에 막대한 피해" onclick="spawnUnitUI(1,'bulldozer')">불도저(10)</button>
+
                 <button class="btn-coin" onclick="openMiniGame(1)">미니게임</button>
             </div>
 
-            <div class="card-row">
-                마법 카드 : <span id="cards1"></span>
-            </div>
-
-            <div class="hero-row">
-                영웅 보유 : <span id="heroes1"></span>
-            </div>
-
-            <div class="upgrade-row">
-                강화 : <span id="upgrades1"></span>
-            </div>
+            <div class="card-row">마법 카드 : <span id="cards1"></span></div>
+            <div class="hero-row">영웅 보유 : <span id="heroes1"></span></div>
+            <div class="upgrade-row">강화 : <span id="upgrades1"></span></div>
         </div>
 
-        <div class="panel" style="text-align:right;">
+        <!-- P2 패널 -->
+        <div class="panel" style="text-align:right;" id="p2-panel">
             <h3>P2</h3>
-
             <div class="resource" style="justify-content:flex-end;">
                 <div>골드 : <span id="gold2">30</span></div>
                 <div>코인 : <span id="coin2">5</span></div>
             </div>
-
             <div style="display:flex;flex-direction:column;align-items:flex-end;">
-                <div class="bar">
-                    <div id="g2" class="gold"></div>
-                </div>
-
-                <div class="bar">
-                    <div id="c2" class="coin"></div>
-                </div>
+                <div class="bar"><div id="g2" class="gold"></div></div>
+                <div class="bar"><div id="c2" class="coin"></div></div>
             </div>
+            <div class="hp-box">거점 체력 : <span id="hp2">2000</span></div>
 
-            <div class="hp-box">
-                거점 체력 : <span id="hp2">2000</span>
-            </div>
-
-            <div class="unit-row">
-
-                <button class="btn-coin" onclick="openMiniGame(2)">미니게임</button>
+            <div class="unit-row" id="p2-unit-row">
+                <button class="btn-coin" id="p2-mini-btn" onclick="openMiniGame(2)">미니게임</button>
 
                 <button class="btn-gold unit-btn" data-info="김원
 체력 : 1200
@@ -326,19 +357,16 @@
 공격속도 : 1.4초
 특징 : 기본 근접 / 밀치기 가능" onclick="spawnUnitUI(2,'melee')">병(3)</button>
 
+                <button class="btn-gold unit-btn" id="p2-bulldozer-btn" style="display:none;"
+                data-info="폭탄 불도저
+체력 : 900
+비용 : 10골드
+특징 : 적진 돌진 후 자폭 / 적 기지에 막대한 피해" onclick="spawnUnitUI(2,'bulldozer')">불도저(10)</button>
             </div>
 
-            <div class="card-row">
-                마법 카드 : <span id="cards2"></span>
-            </div>
-
-            <div class="hero-row">
-                영웅 보유 : <span id="heroes2"></span>
-            </div>
-
-            <div class="upgrade-row">
-                강화 : <span id="upgrades2"></span>
-            </div>
+            <div class="card-row">마법 카드 : <span id="cards2"></span></div>
+            <div class="hero-row">영웅 보유 : <span id="heroes2"></span></div>
+            <div class="upgrade-row">강화 : <span id="upgrades2"></span></div>
         </div>
 
     </div>
@@ -346,6 +374,18 @@
 </div>
 
 <div id="tooltip"></div>
+
+<script>
+function showHowToMake(){
+    document.getElementById('title-screen').style.display     = 'none';
+    document.getElementById('howtomake-screen').style.display = 'block';
+}
+
+function hideHowToMake(){
+    document.getElementById('howtomake-screen').style.display = 'none';
+    document.getElementById('title-screen').style.display     = 'block';
+}
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
 <script type="module" src="main.js"></script>

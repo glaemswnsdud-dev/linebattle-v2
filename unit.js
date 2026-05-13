@@ -60,7 +60,7 @@ export const UNIT_STATS = {
     bulldozer:{
         name:'폭탄 불도저',
         hp:900,
-        cost:999,
+        cost:10,
         speed:32,
         range:65,
         dmg:0,
@@ -122,93 +122,62 @@ export const UNIT_STATS = {
 
 function getSpritePrefix(type){
 
-    if(type === 'melee') return 'soldier';
-    if(type === 'archer') return 'archer';
-    if(type === 'tank') return 'tank';
-    if(type === 'mage') return 'mage';
-    if(type === 'cavalry') return 'cavalry';
-    if(type === 'bulldozer') return 'bulldozer';
+    if(type === 'melee')      return 'soldier';
+    if(type === 'archer')     return 'archer';
+    if(type === 'tank')       return 'tank';
+    if(type === 'mage')       return 'mage';
+    if(type === 'cavalry')    return 'cavalry';
+    if(type === 'bulldozer')  return 'bulldozer';
 
-    if(type === 'heroMelee') return 'heroMelee';
+    if(type === 'heroMelee')  return 'heroMelee';
     if(type === 'heroRanged') return 'heroRanged';
     if(type === 'heroHealer') return 'heroHealer';
 
-    if(type === 'kimwon') return 'kimwon';
+    if(type === 'kimwon')     return 'kimwon';
 
     return null;
 }
 
 function getSpriteDisplaySize(type){
 
-    if(type === 'melee'){
-        return {w:96, h:96};
-    }
-
-    if(type === 'archer'){
-        return {w:94, h:94};
-    }
-
-    if(type === 'tank'){
-        return {w:122, h:122};
-    }
-
-    if(type === 'mage'){
-        return {w:102, h:102};
-    }
-
-    if(type === 'cavalry'){
-        return {w:128, h:128};
-    }
-
-    if(type === 'bulldozer'){
-        return {w:120, h:120};
-    }
-
-    if(type === 'heroMelee'){
-        return {w:118, h:118};
-    }
-
-    if(type === 'heroRanged'){
-        return {w:112, h:112};
-    }
-
-    if(type === 'heroHealer'){
-        return {w:112, h:112};
-    }
-
-    if(type === 'kimwon'){
-        return {w:108, h:108};
-    }
+    if(type === 'melee')      return {w:96,  h:96};
+    if(type === 'archer')     return {w:94,  h:94};
+    if(type === 'tank')       return {w:122, h:122};
+    if(type === 'mage')       return {w:102, h:102};
+    if(type === 'cavalry')    return {w:128, h:128};
+    if(type === 'bulldozer')  return {w:120, h:120};
+    if(type === 'heroMelee')  return {w:118, h:118};
+    if(type === 'heroRanged') return {w:112, h:112};
+    if(type === 'heroHealer') return {w:112, h:112};
+    if(type === 'kimwon')     return {w:108, h:108};
 
     return {w:76, h:76};
 }
 
 function getNameTagOffset(type, stats){
 
-    if(type === 'melee') return 58;
-    if(type === 'archer') return 58;
-    if(type === 'tank') return 76;
-    if(type === 'mage') return 66;
-    if(type === 'cavalry') return 78;
-    if(type === 'bulldozer') return 74;
-
-    if(type === 'heroMelee') return 76;
+    if(type === 'melee')      return 58;
+    if(type === 'archer')     return 58;
+    if(type === 'tank')       return 76;
+    if(type === 'mage')       return 66;
+    if(type === 'cavalry')    return 78;
+    if(type === 'bulldozer')  return 74;
+    if(type === 'heroMelee')  return 76;
     if(type === 'heroRanged') return 72;
     if(type === 'heroHealer') return 72;
+    if(type === 'kimwon')     return 70;
 
-    if(type === 'kimwon') return 70;
-
-    if(stats.hero) return 46;
+    if(stats.hero)      return 46;
     if(stats.bulldozer) return 52;
 
     return 32;
 }
 
-export function createUnit(scene,x,team,type,pData){
+export function createUnit(scene, x, team, type, pData){
 
     let stats = UNIT_STATS[type];
 
-    const laneOffsets = [-45,-22,0,22,45];
+    const laneOffsets = [-45, -22, 0, 22, 45];
 
     let lane = laneOffsets[pData.laneIdx];
 
@@ -231,16 +200,12 @@ export function createUnit(scene,x,team,type,pData){
 
     if(spritePrefix && scene.textures.exists(spritePrefix + '_idle')){
 
-        u = scene.physics.add.sprite(
-            x,
-            y,
-            spritePrefix + '_idle'
-        );
+        u = scene.physics.add.sprite(x, y, spritePrefix + '_idle');
 
         let displaySize = getSpriteDisplaySize(type);
 
         u.setDisplaySize(displaySize.w, displaySize.h);
-        u.setOrigin(0.5,0.5);
+        u.setOrigin(0.5, 0.5);
 
         u.spritePrefix = spritePrefix;
 
@@ -257,36 +222,27 @@ export function createUnit(scene,x,team,type,pData){
 
     }else{
 
-        u = scene.add.rectangle(
-            x,
-            y,
-            size,
-            size,
-            stats.color
-        );
-
+        u = scene.add.rectangle(x, y, size, size, stats.color);
         scene.physics.add.existing(u);
     }
 
-    u.team = team;
-    u.type = type;
+    u.team  = team;
+    u.type  = type;
     u.stats = stats;
 
-    u.hp = stats.hp;
+    u.hp    = stats.hp;
     u.maxHp = stats.hp;
 
-    u.lastAttack = 0;
-    u.stopUntil = 0;
-    u.lastTeleport = -999999;
+    u.lastAttack      = 0;
+    u.stopUntil       = 0;
+    u.lastTeleport    = -999999;
     u.selfDestructing = false;
-    u.isCharging = false;
+    u.isCharging      = false;
 
     u.body.setCollideWorldBounds(true);
 
     u.body.setVelocityX(
-        team === 1
-        ? stats.speed
-        : -stats.speed
+        team === 1 ? stats.speed : -stats.speed
     );
 
     let nameOffset = getNameTagOffset(type, stats);
@@ -296,11 +252,11 @@ export function createUnit(scene,x,team,type,pData){
         y - nameOffset,
         stats.name,
         {
-            fontSize: stats.hero ? '16px' : '14px',
-            color: stats.hero ? '#ffd700' : '#ffffff',
-            stroke:'#000000',
-            strokeThickness:3,
-            fontStyle: stats.hero ? 'bold' : 'normal'
+            fontSize:      stats.hero ? '16px' : '14px',
+            color:         stats.hero ? '#ffd700' : '#ffffff',
+            stroke:        '#000000',
+            strokeThickness: 3,
+            fontStyle:     stats.hero ? 'bold' : 'normal'
         }
     ).setOrigin(0.5);
 
