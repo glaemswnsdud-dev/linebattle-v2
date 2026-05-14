@@ -86,7 +86,7 @@ function preload(){
     loadUnitImages(this, 'bulldozer');
 
     loadUnitImages(this, 'heroMelee');
-    loadUnitImages(this, 'heroranged');
+    loadUnitImages(this, 'heroRanged');
     loadUnitImages(this, 'heroHealer');
 
     loadUnitImages(this, 'kimwon');
@@ -112,7 +112,7 @@ function create(){
 
     [
         'soldier','archer','tank','mage','cavalry','bulldozer',
-        'heroMelee','heroranged','heroHealer','kimwon'
+        'heroMelee','heroRanged','heroHealer','kimwon'
     ].forEach(prefix=>{
         ['idle','walk1','walk2','attack1','attack2','dead'].forEach(action=>{
             let key = prefix + '_' + action;

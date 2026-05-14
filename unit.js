@@ -130,7 +130,7 @@ function getSpritePrefix(type){
     if(type === 'bulldozer')  return 'bulldozer';
 
     if(type === 'heroMelee')  return 'heroMelee';
-    if(type === 'heroRanged') return 'heroranged';  // 소문자
+    if(type === 'heroRanged') return 'heroRanged';
     if(type === 'heroHealer') return 'heroHealer';
 
     if(type === 'kimwon')     return 'kimwon';
